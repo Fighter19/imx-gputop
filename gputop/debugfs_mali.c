@@ -82,6 +82,7 @@ static char class_mem[CCTX_MEMORY_CLASS_COUNT ][128]= {
    "CL Workgroup/Thread (Total memory: ",
    "CL Host Memory (Total memory: ",
    "CL Shared Virtual Memory (Total memory: ",
+   "CL Protected Memory (Total memory: ",
    "CINSTR Memory (Total memory: ",
    "GFX Device Memory CPU Uncached (Total memory: ",
    "GFX Device Memory CPU Cached (Total memory: ",
@@ -148,6 +149,7 @@ static char class_mem_name[CCTX_MEMORY_CLASS_COUNT ][128]= {
    "CL Workgroup/Thread",
    "CL Host Memory ",
    "CL Shared Virtual Memory ",
+   "CL Protected Memory ",
    "CINSTR Memory",
    "GFX Device Memory CPU Uncached",
    "GFX Device Memory CPU Cached",
@@ -524,7 +526,10 @@ void gtop_display_mali_debugfs_info(void){
       fprintf(stdout, "%3s%8"PRIu32"%12s%8"PRIu32,
             "", (curr_ctx_client->mem).class_mem_total / (1024), 
             "", curr_ctx_client->ctx_gpu_mem_total / (1024));
-      fprintf(stdout, "                  %s", strrchr(curr_ctx_client->process_name, '/')+1);
+      if(curr_ctx_client->process_name[0] == '/')
+         fprintf(stdout, "                  %s", strrchr(curr_ctx_client->process_name, '/')+1);
+      else
+         fprintf(stdout, "                  %s", curr_ctx_client->process_name);
       fprintf(stdout, "\n");
       
    }
