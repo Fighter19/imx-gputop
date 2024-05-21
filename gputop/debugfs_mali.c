@@ -421,9 +421,28 @@ int debugfs_get_gpu_usage(struct debugfs_mali_info *info, const char *path)
       }
       //fprintf(stdout, "busy time %d and idle time %d\n", info->busy_time, info->idle_time);
       fclose(file);
+   }
+   else fprintf(stderr, "Failed to fget dvfs usage\n");
+   file = fopen("/sys/kernel/debug/clk/gpu/clk_rate", "r");
+
+   if (!file){
+      fprintf(stderr, "Failed to open clk/gpu/clk_rate file\n");
+      return -1;
+   }
+
+   memset(buf, 0, sizeof(char) * 1024);
+   if( fgets(buf, 1024, file) != NULL){
+      err = sscanf(line, " %d\n", &info->last_render_freq);
+      if(err !=1){
+         fprintf(stderr, "Failed to sscanf last period render frequency\n");
+         return -1;
+      }
+      // fprintf(stdout, "%d\n", info->last_render_freq);
+      fclose(file);
       return 0;
    }
    fprintf(stderr, "Failed to fget dvfs usage\n");
+
    return -1;
 }
 
@@ -496,9 +515,9 @@ void gtop_display_mali_debugfs_info(void){
    }
    fprintf(stdout, "%s", regular_color);
    if(info.busy_time == 0) 
-      fprintf(stdout, "GPU utilization: %.2f%%\n", 0.0);
+      fprintf(stdout, "GPU last render period frequency : utilization    %dMHz : %.2f%%\n", info.last_render_freq/1000000, 0.0);
    else 
-      fprintf(stdout, "GPU utilization:  %.2f%%\n", info.busy_time*100.0/(info.busy_time+info.idle_time));      
+      fprintf(stdout, "GPU last render period frequency:utilization    %dMHz : %.2f%%\n", info.last_render_freq/1000000, info.busy_time*100.0/(info.busy_time+info.idle_time));
    fprintf(stdout, "gpu kernel Mem: %dKB total\n", info.total_mem_used*4);
    debugfs_free_kctx_clients(&kctx_clients);
 

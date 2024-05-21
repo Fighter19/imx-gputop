@@ -107,6 +107,7 @@ typedef enum
 	uint32_t busy_time;
 	uint32_t idle_time;
 	uint32_t total_mem_used;
+	uint32_t last_render_freq;
 
 	char  name[128];
 
